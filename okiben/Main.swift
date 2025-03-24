@@ -17,7 +17,6 @@ struct Main: View {
                 VStack {
                     // ------------ アプリ上部タイトル(=FlutterのAppBar) ------------
                     Text("")
-                        .padding()
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             // - - - - - - 真ん中のタイトル - - - - - -
@@ -38,6 +37,7 @@ struct Main: View {
                         }
                         .toolbarBackground(Color(red: 240/255, green: 240/255, blue: 240/255), for: .navigationBar)   // ツールバーの背景色を灰色に設定
                         .toolbarBackground(.visible, for: .navigationBar)   // ツールバーの背景を表示
+                        .frame(height: 0)
                     // -----------------------------------------------------------
                     
                     // -------- アプリ下部タブ(=FlutterのBottomNavigationBar) --------
