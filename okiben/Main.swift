@@ -3,6 +3,7 @@ import SwiftUI
 struct Main: View {
     @State private var selectedTab = 0
     @State private var showingDialog = false
+    @State private var showModal = false
     
     
     init(){
@@ -43,7 +44,11 @@ struct Main: View {
                     // -------- アプリ下部タブ(=FlutterのBottomNavigationBar) --------
                     TabView(selection: $selectedTab) {
                         // 置き勉管理ページ
-                        ManagePage()
+                        ManagePage(
+                            argIsOnPressed: { value in
+                                showModal = true
+                            }
+                        )
                             .tabItem {
                                 Image(systemName: "slider.horizontal.3")
                                 Text("置き勉管理")
@@ -90,6 +95,54 @@ struct Main: View {
                             }
                         }
                     }
+                }
+                // -----------------------------------------------------------
+                
+                // --------------------- 画面下部ダイアログ ----------------------
+                if (showModal) {
+//                    
+//                    NavigationStack {
+//                        VStack {
+//                            Text("SheetView")
+//                        }
+//                        .toolbar {
+//                            Button("Close", role: .cancel){
+//                                sheet.toggle()
+//                            }
+//                        }
+//                    }.presentationDetents([.medium])
+                    
+                    
+                    
+                    /*
+                    VStack {
+                        Spacer()
+                        VStack {
+                            Text("これはダイアログです")
+                                .font(.title)
+                                .padding()
+                            
+                            Button("閉じる") {
+                                showModal.toggle()
+                            }
+                            .padding()
+                        }
+                        .frame(maxWidth: .infinity) // 画面幅いっぱいに広げる
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 10)
+
+    //                    Spacer() // これがあると中央配置される
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity) // 画面全体を覆う
+                    .background(Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)) // 背景オーバーレイ
+                    .onTapGesture {
+                        showModal.toggle() // 背景タップで閉じる
+                    }
+                    .transition(.move(edge: .bottom)) // 下からスライド
+                    .animation(.easeInOut, value: showModal)
+                    .padding(0)
+                    */
                 }
                 // -----------------------------------------------------------
             }
