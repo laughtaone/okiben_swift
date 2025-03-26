@@ -5,12 +5,20 @@ struct ComponentCommonButton: View {
     let onPressed: (() -> Void)?
     let customButtonColor: Color?
     let customWidth: CGFloat
+    let customFontSize: CGFloat
     
-    init(buttonText: String, onPressed: (() -> Void)?, customButtonColor: Color? = nil, customWidth: CGFloat = 190) {
+    init(
+        buttonText: String,
+        onPressed: (() -> Void)?,
+        customButtonColor: Color? = nil,
+        customWidth: CGFloat = 190,
+        customFontSize: CGFloat = 17
+    ) {
         self.buttonText = buttonText
         self.onPressed = onPressed
         self.customButtonColor = customButtonColor
         self.customWidth = customWidth
+        self.customFontSize = customFontSize
     }
 
     var body: some View {
@@ -18,7 +26,7 @@ struct ComponentCommonButton: View {
             onPressed?()
         }) {
             Text(buttonText)
-                .font(.system(size: 17, weight: .bold))
+                .font(.system(size: customFontSize, weight: .bold))
                 .frame(width: customWidth, height: 63)
                 .background(
                     (customButtonColor != nil ? customButtonColor : (colorScheme == .light ? Color.gray : Color.gray))

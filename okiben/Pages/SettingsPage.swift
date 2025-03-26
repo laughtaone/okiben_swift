@@ -22,6 +22,8 @@ struct SettingsPage: View {
     @State private var isDisplayAllDeleteDialog = false
     @State private var isUnlockedAllDelete = false
     
+    let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
+    
     
     
 
@@ -150,7 +152,9 @@ struct SettingsPage: View {
                                             onPressed: { print("完全に削除ボタンが押されました") },
                                             customButtonColor: (isUnlockedAllDelete)
                                                 ? Color(red: 204/255, green: 61/255, blue: 61/255)
-                                                : Color(red: 237/255, green: 187/255, blue: 187/255)
+                                                : Color(red: 237/255, green: 187/255, blue: 187/255),
+                                            customWidth: 230,
+                                            customFontSize: 20
                                         )
                                         .padding(.horizontal)
                                         .frame(maxWidth: .infinity)
@@ -163,7 +167,7 @@ struct SettingsPage: View {
                                             Image(systemName: "lock.open")
                                             Text("ロック解除 (長押し)")
                                         }
-                                            .font(.system(size: 12))
+                                            .font(.system(size: 15))
                                             .foregroundColor(Color.black).opacity((isUnlockedAllDelete) ? 0.2 : 1)
                                             .padding(10)
                                             .background((isUnlockedAllDelete)
@@ -175,6 +179,8 @@ struct SettingsPage: View {
                                             .onLongPressGesture(minimumDuration: 0.7) {
                                                 print("ロック解除ボタンが長押しされました")
                                                 isUnlockedAllDelete = true
+                                                feedbackGenerator.prepare()
+                                                feedbackGenerator.impactOccurred()
                                             }
                                         // - - - - - - - - - - - - - - - - - - -
                                         
