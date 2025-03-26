@@ -5,15 +5,21 @@ struct ComponentUpDialog<Content: View>: View {
     @State var title: String
     var argIsOnPressed: () -> Void
     let content: () -> Content
-    
-    init(showModal: Binding<Bool>, title: String, argIsOnPressed: @escaping () -> Void, @ViewBuilder content: @escaping () -> Content) {
+    var isNeedLRPadding: Bool
+
+    init(
+        showModal: Binding<Bool>,
+        title: String,
+        argIsOnPressed: @escaping () -> Void,
+        isNeedLRPadding: Bool = true, // ここでデフォルト値を設定
+        @ViewBuilder content: @escaping () -> Content
+    ) {
         self._showModal = showModal
         self.title = title
         self.argIsOnPressed = argIsOnPressed
+        self.isNeedLRPadding = isNeedLRPadding
         self.content = content
     }
-    
-    
 
 
     var body: some View {
@@ -21,7 +27,7 @@ struct ComponentUpDialog<Content: View>: View {
             VStack {
                 content()
             }
-            .padding(.horizontal, 15)
+            .padding(.horizontal, (isNeedLRPadding) ? 15 : 0)
             .padding(.top, 8)   // ヘッダーと操作対象の間の余白
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -31,12 +37,6 @@ struct ComponentUpDialog<Content: View>: View {
                         .padding(.top, 15)
                         .font(.system(size: 24))
                         .padding(.leading, 0) // 左の余白を削除
-                }
-                // - - - - - - - - - - - - - - - - - - - -
-                // - - - - - - - 真ん中のバー - - - - - - - -
-                ToolbarItem(placement: .principal) {
-                    ComponentDialogBar()
-                        .padding(.horizontal, 0) // 水平余白を削除
                 }
                 // - - - - - - - - - - - - - - - - - - - -
                 // - - - - - - 右側の閉じるボタン - - - - - -
@@ -52,6 +52,7 @@ struct ComponentUpDialog<Content: View>: View {
                 // - - - - - - - - - - - - - - - - - - -
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.fraction(0.47)])
+        .presentationDragIndicator(.visible)
     }
 }

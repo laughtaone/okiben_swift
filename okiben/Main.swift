@@ -4,6 +4,9 @@ struct Main: View {
     @State private var selectedTab = 0
     @State private var showingDialog = false
     @State private var showModal = false
+    @State private var isDisplaySettingPage = false
+    @State private var isDisplayAddPage = false
+    @State var inputNewItemName = ""
     
     
     init(){
@@ -16,7 +19,7 @@ struct Main: View {
         NavigationView {
             ZStack {
                 VStack {
-                    // ------------ アプリ上部タイトル(=FlutterのAppBar) ------------
+                    // ----------------------- アプリ上部タイトル(=FlutterのAppBar) ----------------------
                     Text("")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
@@ -30,7 +33,9 @@ struct Main: View {
                             // - - - - - - - - - - - - - - - - - - -
                             // - - - - - - - 設定ボタン - - - - - - -
                             ToolbarItem(placement: .navigationBarTrailing) {
-                                NavigationLink(destination: SettingsPage()) {
+                                Button(action: {
+                                    isDisplaySettingPage.toggle()
+                                }) {
                                     Image(systemName: "gearshape")
                                 }
                             }
@@ -39,9 +44,9 @@ struct Main: View {
                         .toolbarBackground(Color(red: 240/255, green: 240/255, blue: 240/255), for: .navigationBar)   // ツールバーの背景色を灰色に設定
                         .toolbarBackground(.visible, for: .navigationBar)   // ツールバーの背景を表示
                         .frame(height: 0)
-                    // -----------------------------------------------------------
+                    // -------------------------------------------------------------------------------
                     
-                    // -------- アプリ下部タブ(=FlutterのBottomNavigationBar) --------
+                    // ------------------ アプリ下部タブ(=FlutterのBottomNavigationBar) ------------------
                     TabView(selection: $selectedTab) {
                         // 置き勉管理ページ
                         ManagePage(
@@ -64,16 +69,26 @@ struct Main: View {
                             .tag(1)
                     }
                     .frame(maxHeight: .infinity) // TabViewの高さを最大化
-                    // -----------------------------------------------------------
+                    // -------------------------------------------------------------------------------
                 }
-                // -------- 画面右下のボタン(=FlutterのFloatActionButton) --------
+                .sheet(isPresented: $isDisplaySettingPage) {
+                    SettingsPage(
+                        argIsOnPressed: {
+                            isDisplaySettingPage = false
+                        }
+                    )
+                        .presentationDetents([.large]) // .largeでフルスクリーン表示
+                        .presentationDragIndicator(.visible)
+                }
+
+                // ------------------ 画面右下のボタン(=FlutterのFloatActionButton) -------------------
                 if (selectedTab == 0) {
                     VStack {
                         Spacer()
                         HStack {
                             Spacer()
                             Button(action: {
-                                showingDialog = true
+                                isDisplayAddPage = true
                                 print("右下の+ボタンが押されたお")
                             }) {
                                 Image(systemName: "plus")
@@ -84,67 +99,52 @@ struct Main: View {
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
                             }
-                            .padding(.trailing, 20)  // 右側の余白
-                            .padding(.bottom, 80)    // 下側の余白
-                            .alert(isPresented: $showingDialog) {
-                                Alert(
-                                    title: Text("ダイアログ"),
-                                    message: Text("本文"),
-                                    dismissButton: .default(Text("OK"))
+                            .padding(.trailing, 20)
+                            .padding(.bottom, 80)
+                            .sheet(isPresented: $isDisplayAddPage) {
+                                ComponentUpDialog(
+                                    showModal: .constant(true),
+                                    title: "📚 アイテム追加",
+                                    argIsOnPressed: {
+                                        isDisplayAddPage = false
+                                    },
+                                    content: {
+                                        VStack(alignment: .leading) {
+                                            // - - - - - - -　元の名前案内 - - - - - -
+                                            ComponentTargetDisplayView(title: "元の名前", displayText: "サンプルタイトル")
+                                            // - - - - - - - - - - - - - - - - - - -
+                                            
+                                            Spacer().frame(height: 40)
+                                            
+                                            Text("↓ 追加するアイテム名を入力")
+                                                .font(.system(size: 14))
+                                            TextField("", text: $inputNewItemName)
+                                                .font(.system(size: 16))
+                                                .padding()
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                                                )
+                                            
+                                            Spacer().frame(height: 40)
+                                            
+                                            ComponentCommonButton(
+                                                buttonText: "保存",
+                                                onPressed: { print("保存ボタンが押されました") }
+                                            )
+                                            .padding(.horizontal)
+                                            .frame(maxWidth: .infinity)
+                                            
+                                            Spacer()
+                                        }
+                                    }
                                 )
                             }
                         }
                     }
                 }
-                // -----------------------------------------------------------
+                // -------------------------------------------------------------------------------
                 
-                // --------------------- 画面下部ダイアログ ----------------------
-                if (showModal) {
-//                    
-//                    NavigationStack {
-//                        VStack {
-//                            Text("SheetView")
-//                        }
-//                        .toolbar {
-//                            Button("Close", role: .cancel){
-//                                sheet.toggle()
-//                            }
-//                        }
-//                    }.presentationDetents([.medium])
-                    
-                    
-                    
-                    /*
-                    VStack {
-                        Spacer()
-                        VStack {
-                            Text("これはダイアログです")
-                                .font(.title)
-                                .padding()
-                            
-                            Button("閉じる") {
-                                showModal.toggle()
-                            }
-                            .padding()
-                        }
-                        .frame(maxWidth: .infinity) // 画面幅いっぱいに広げる
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .shadow(radius: 10)
-
-    //                    Spacer() // これがあると中央配置される
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity) // 画面全体を覆う
-                    .background(Color.black.opacity(0.3).edgesIgnoringSafeArea(.all)) // 背景オーバーレイ
-                    .onTapGesture {
-                        showModal.toggle() // 背景タップで閉じる
-                    }
-                    .transition(.move(edge: .bottom)) // 下からスライド
-                    .animation(.easeInOut, value: showModal)
-                    .padding(0)
-                    */
-                }
-                // -----------------------------------------------------------
             }
         }
     }
