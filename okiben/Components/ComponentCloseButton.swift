@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ComponentCloseButton: View {
     var onPressed: () -> Void
-    var customIconSize: CGFloat = 40  // アイコンサイズ (デフォルトは27)
+    var customIconSize: CGFloat = 38  // アイコンサイズ (デフォルトは27)
 
     @Environment(\.colorScheme) var colorScheme
 

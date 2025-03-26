@@ -3,13 +3,18 @@ import SwiftUI
 struct ComponentUpDialog<Content: View>: View {
     @Binding var showModal: Bool
     @State var title: String
+    var argIsOnPressed: () -> Void
     let content: () -> Content
     
-    init(showModal: Binding<Bool>, title: String, @ViewBuilder content: @escaping () -> Content) {
-        self._showModal = showModal // @Bindingは_をつけて初期化
-        self.title = title // @Stateプロパティに直接初期化
-        self.content = content // contentプロパティを初期化
+    init(showModal: Binding<Bool>, title: String, argIsOnPressed: @escaping () -> Void, @ViewBuilder content: @escaping () -> Content) {
+        self._showModal = showModal
+        self.title = title
+        self.argIsOnPressed = argIsOnPressed
+        self.content = content
     }
+    
+    
+
 
     var body: some View {
         NavigationStack {
@@ -37,7 +42,10 @@ struct ComponentUpDialog<Content: View>: View {
                 // - - - - - - 右側の閉じるボタン - - - - - -
                 ToolbarItem(placement: .navigationBarTrailing) {
                     ComponentCloseButton(
-                        onPressed: { showModal.toggle() }
+                        onPressed: {
+                            showModal.toggle()
+                            argIsOnPressed()
+                        }
                     )
                     .padding(.trailing, 0) // 右の余白を削除
                 }
