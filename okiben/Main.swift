@@ -1,18 +1,41 @@
 import SwiftUI
 
 struct Main: View {
+    // ================================================== 変数類 =================================================
     @State private var selectedTab = 0
-    @State private var showingDialog = false
-    @State private var showModal = false
     @State private var isDisplaySettingPage = false
     @State private var isDisplayAddPage = false
     @State var inputNewItemName = ""
+
+    @State private var itemList: [ItemData] = [
+        ItemData(name: "数学の教科書", memo: "Aくんに貸した", isOkiben: true),
+        ItemData(name: "英語の教科書", memo: "来週の授業で必要！", isOkiben: false)
+    ]
     
+    // ライトモードかどうかの真偽値
+    @Environment(\.colorScheme) var colorScheme
+    var isLightMode: Bool {
+        colorScheme == .light
+    }
     
     init(){
         // TabViewの背景色の設定
         UITabBar.appearance().backgroundColor = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1)
+        
+        let appearance = UITabBarAppearance()
+        if #available(iOS 13.0, *) {
+            appearance.backgroundColor = UIColor { traitCollection in
+                (traitCollection.userInterfaceStyle == .light)
+                    ? UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1)
+                    : UIColor(red: 58/255, green: 58/255, blue: 58/255, alpha: 1)
+            }
+        }
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        UITabBar.appearance().standardAppearance = appearance
     }
+    // ==========================================================================================================
+
+
     
 
     var body: some View {
@@ -41,7 +64,12 @@ struct Main: View {
                             }
                             // - - - - - - - - - - - - - - - - - - -
                         }
-                        .toolbarBackground(Color(red: 240/255, green: 240/255, blue: 240/255), for: .navigationBar)   // ツールバーの背景色を灰色に設定
+                        .toolbarBackground(
+                            (isLightMode)
+                                ? Color(red: 240/255, green: 240/255, blue: 240/255)
+                                : Color(red: 58/255, green: 58/255, blue: 58/255),
+                            for: .navigationBar
+                        )
                         .toolbarBackground(.visible, for: .navigationBar)   // ツールバーの背景を表示
                         .frame(height: 0)
                     // -------------------------------------------------------------------------------
@@ -50,9 +78,11 @@ struct Main: View {
                     TabView(selection: $selectedTab) {
                         // 置き勉管理ページ
                         ManagePage(
-                            argIsOnPressed: { value in
-                                showModal = true
-                            }
+                            itemList: $itemList,
+                            argListChanged: { newList in
+                                itemList = newList
+                            },
+                            isLightMode: isLightMode
                         )
                             .tabItem {
                                 Image(systemName: "slider.horizontal.3")
@@ -61,7 +91,10 @@ struct Main: View {
                             .tag(0)
                         
                         // ビューページ
-                        ViewPage()
+                        ViewPage(
+                            itemList: $itemList,
+                            isLightMode: isLightMode
+                        )
                             .tabItem {
                                 Image(systemName: "map")
                                 Text("ビュー")
@@ -75,7 +108,11 @@ struct Main: View {
                     SettingsPage(
                         argIsOnPressed: {
                             isDisplaySettingPage = false
-                        }
+                        },
+                        argListClear: {
+                            itemList.removeAll()
+                        },
+                        isLightMode: isLightMode
                     )
                         .presentationDetents([.large]) // .largeでフルスクリーン表示
                         .presentationDragIndicator(.visible)
@@ -94,8 +131,10 @@ struct Main: View {
                                 Image(systemName: "plus")
                                     .font(.system(size: 24))
                                     .padding()
-                                    .background(Color.black)
-                                    .foregroundColor(.white)
+                                    .background((isLightMode)
+                                        ? Color(red: 64/255, green: 64/255, blue: 64/255)
+                                        : Color(red: 224/255, green: 224/255, blue: 224/255))
+                                    .foregroundColor((isLightMode) ? .white : .black)
                                     .clipShape(Circle())
                                     .shadow(radius: 5)
                             }
@@ -110,12 +149,9 @@ struct Main: View {
                                     },
                                     content: {
                                         VStack(alignment: .leading) {
-                                            // - - - - - - -　元の名前案内 - - - - - -
-                                            ComponentTargetDisplayView(title: "元の名前", displayText: "サンプルタイトル")
-                                            // - - - - - - - - - - - - - - - - - - -
+                                            Spacer().frame(height: 15)
                                             
-                                            Spacer().frame(height: 40)
-                                            
+                                            // - - - -　アイテム名入力フィールド - - - -
                                             Text("↓ 追加するアイテム名を入力")
                                                 .font(.system(size: 14))
                                             TextField("", text: $inputNewItemName)
@@ -125,15 +161,32 @@ struct Main: View {
                                                     RoundedRectangle(cornerRadius: 8)
                                                         .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                                                 )
+                                            // - - - - - - - - - - - - - - - - - - -
                                             
                                             Spacer().frame(height: 40)
                                             
+                                            // - - - - - - -　保存ボタン - - - - - - -
                                             ComponentCommonButton(
                                                 buttonText: "保存",
-                                                onPressed: { print("保存ボタンが押されました") }
+                                                onPressed: (inputNewItemName != "")
+                                                    ? {
+                                                        print("保存ボタンが押されました")
+                                                        itemList.append(ItemData(name: inputNewItemName, memo: "", isOkiben: false))
+                                                        inputNewItemName = ""
+                                                        isDisplayAddPage = false
+                                                    }
+                                                    : nil,
+                                                customButtonColor: (inputNewItemName != "")
+                                                    ? (isLightMode)
+                                                        ? Color(red: 85/255, green: 85/255, blue: 85/255)
+                                                        : Color(red: 110/255, green: 110/255, blue: 110/255)
+                                                    : (isLightMode)
+                                                        ? Color(red: 235/255, green: 235/255, blue: 235/255)
+                                                        : Color(red: 95/255, green: 95/255, blue: 95/255)
                                             )
                                             .padding(.horizontal)
                                             .frame(maxWidth: .infinity)
+                                            // - - - - - - - - - - - - - - - - - - -
                                             
                                             Spacer()
                                         }
@@ -155,4 +208,13 @@ struct Main: View {
 
 #Preview {
     Main()
+}
+
+
+
+struct ItemData: Identifiable {
+    var id = UUID()
+    var name: String
+    var memo: String
+    var isOkiben: Bool
 }

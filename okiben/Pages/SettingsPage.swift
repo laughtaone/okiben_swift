@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsPage: View {
+    // ================================================== 変数類 =================================================
     var argIsOnPressed: () -> Void
     @State private var isDarkMode = false
     @State private var notificationsEnabled = true
@@ -24,14 +25,15 @@ struct SettingsPage: View {
     
     let feedbackGenerator = UIImpactFeedbackGenerator(style: .heavy)
     
+    var argListClear: () -> Void
+    
+    var isLightMode: Bool
+    // ==========================================================================================================
+    
     
     
 
     var body: some View {
-        // ------------ アプリ上部タイトル(=FlutterのAppBar) ------------
-        
-        // -----------------------------------------------------------
-        
         ComponentUpDialog(
             showModal: .constant(true),
             title: "🔧 設定",
@@ -69,13 +71,12 @@ struct SettingsPage: View {
                         HStack(alignment: .top) {
                             Image(systemName: "1.square")
                                 .padding(.top, 2)
-                                .foregroundColor(.black)
                             Text("アイテムを「置き勉管理」タブの右下の+ボタンから追加します")
                         }
                         HStack(alignment: .top) {
                             Image(systemName: "2.square")
                                 .padding(.top, 2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             VStack(alignment: .leading) {
                                 Text("追加したアイテムを")
                                 Toggle("・置き勉したら", isOn: .constant(true))
@@ -86,13 +87,13 @@ struct SettingsPage: View {
                         HStack(alignment: .top) {
                             Image(systemName: "3.square")
                                 .padding(.top, 2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             Text("各アイテムをタップすると「編集」「メモ」「削除」の操作ができます")
                         }
                         HStack(alignment: .top) {
                             Image(systemName: "4.square")
                                 .padding(.top, 2)
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                             Text("各アイテムの置き勉状況は「ビュー」タブから一覧で見ることができます")
                         }
                     }
@@ -149,10 +150,16 @@ struct SettingsPage: View {
                                         // - - - - - - - 完全に削除ボタン - - - - -
                                         ComponentCommonButton(
                                             buttonText: "完全に削除",
-                                            onPressed: { print("完全に削除ボタンが押されました") },
+                                            onPressed: (isUnlockedAllDelete)
+                                                ? {
+                                                    print("完全に削除ボタンが押されました")
+                                                    argListClear()
+                                                    isDisplayAllDeleteDialog = false
+                                                }
+                                                : nil,
                                             customButtonColor: (isUnlockedAllDelete)
-                                                ? Color(red: 204/255, green: 61/255, blue: 61/255)
-                                                : Color(red: 237/255, green: 187/255, blue: 187/255),
+                                                ? Color(red: 230/255, green: 100/255, blue: 100/255)
+                                                : Color(red: 250/255, green: 200/255, blue: 200/255),
                                             customWidth: 230,
                                             customFontSize: 20
                                         )
@@ -168,11 +175,15 @@ struct SettingsPage: View {
                                             Text("ロック解除 (長押し)")
                                         }
                                             .font(.system(size: 15))
-                                            .foregroundColor(Color.black).opacity((isUnlockedAllDelete) ? 0.2 : 1)
+                                            .foregroundColor((isLightMode) ? Color.black : Color.white).opacity((isUnlockedAllDelete) ? 0.2 : 1)
                                             .padding(10)
                                             .background((isUnlockedAllDelete)
-                                                ? Color(red: 251/255, green: 251/255, blue: 251/255)
-                                                : Color(red: 224/255, green: 224/255, blue: 224/255)
+                                                ? (isLightMode)
+                                                    ? Color(red: 251/255, green: 251/255, blue: 251/255)
+                                                    : Color(red: 65/255, green: 65/255, blue: 65/255)
+                                                : (isLightMode)
+                                                    ? Color(red: 224/255, green: 224/255, blue: 224/255)
+                                                    : Color(red: 115/255, green: 115/255, blue: 115/255)
                                             )
                                             .cornerRadius(10)
                                             .frame(maxWidth: .infinity)
@@ -186,7 +197,8 @@ struct SettingsPage: View {
                                         
                                         Spacer()
                                     }
-                                }
+                                },
+                                isLightMode: isLightMode
                             )
                         }
 
@@ -205,10 +217,9 @@ struct SettingsPage: View {
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
                                     .padding(.trailing, 4)
-                                Text("GitHub").foregroundColor(.black)
+                                Text("GitHub").foregroundColor(.primary)
                                 Spacer()
-                                Text("@laughtaone")
-                                    .foregroundColor(.gray)
+                                Text("@laughtaone").foregroundColor(.gray)
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
                         }
@@ -226,10 +237,9 @@ struct SettingsPage: View {
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
                                     .padding(.trailing, 4)
-                                Text("X").foregroundColor(.black)
+                                Text("X").foregroundColor(.primary)
                                 Spacer()
-                                Text("@laughtaone")
-                                    .foregroundColor(.gray)
+                                Text("@laughtaone").foregroundColor(.gray)
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
                         }
@@ -247,7 +257,7 @@ struct SettingsPage: View {
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
                                     .padding(.trailing, 4)
-                                Text("開発者 その他アプリ").foregroundColor(.black)
+                                Text("開発者 その他アプリ").foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
@@ -268,7 +278,7 @@ struct SettingsPage: View {
                         } label: {
                             HStack {
                                 Image(systemName: "text.document").foregroundColor(.gray)
-                                Text("利用規約").foregroundColor(.black)
+                                Text("利用規約").foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
@@ -284,7 +294,7 @@ struct SettingsPage: View {
                         } label: {
                             HStack {
                                 Image(systemName: "text.document").foregroundColor(.gray)
-                                Text("プライバシーポリシー").foregroundColor(.black)
+                                Text("プライバシーポリシー").foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
@@ -300,7 +310,7 @@ struct SettingsPage: View {
                         } label: {
                             HStack {
                                 Image(systemName: "book.closed").foregroundColor(.gray)
-                                Text("使用パッケージ").foregroundColor(.black)
+                                Text("使用パッケージ").foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
@@ -321,7 +331,7 @@ struct SettingsPage: View {
                         } label: {
                             HStack {
                                 Image(systemName: "number").foregroundColor(.gray)
-                                Text("アプリバージョン").foregroundColor(.black)
+                                Text("アプリバージョン").foregroundColor(.primary)
                                 Spacer()
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
@@ -332,7 +342,8 @@ struct SettingsPage: View {
                     }
                     // -------------------------------------------------------------------------------
                 }
-            }
+            },
+            isLightMode: isLightMode
         )
     }
 }

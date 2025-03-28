@@ -1,32 +1,50 @@
 import SwiftUI
 
-
 struct ManagePage: View {
+    // ================================================== 変数類 =================================================
     @State private var showModal = false
-    var argIsOnPressed: (Bool) -> Void
-
+    @Binding var itemList: [ItemData]
+    var argListChanged: ([ItemData]) -> Void
+    var isLightMode: Bool
+    // ==========================================================================================================
     
+
+
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     // - - - - - - - アイテム数表示 - - - - - -
-                    Text("全？アイテム(置き勉？点 | 家？点)")
+                    Text("全\(itemList.count)アイテム (置き勉\(itemList.filter { $0.isOkiben }.count)点 | 家\(itemList.filter { !$0.isOkiben }.count)点)")
                         .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.bottom, 10)
                     // - - - - - - - - - - - - - - - - - - -
-                    
+
                     // - - - - - - - アイテムタイル - - - - - -
-                    ComponentItemTile(
-                        title: "サンプルタイトル",
-                        memo: "これはメモのテキストです。最大2行まで表示されます。",
-                        value: true,
-                        onToggle: { newValue in
-                            
-                        },
-                        argIsOnPressed: { value in
-                            argIsOnPressed(true)
-                        }
-                    )
+                    ForEach(itemList.indices, id: \.self) { index in
+                        ComponentItemTile(
+                            name: itemList[index].name,
+                            memo: itemList[index].memo,
+                            value: $itemList[index].isOkiben,
+                            argIsOkibenChanged: { newIsOkiben in
+                                itemList[index].isOkiben = newIsOkiben
+                                argListChanged(itemList)
+                            },
+                            argNameChanged: { newName in
+                                itemList[index].name = newName
+                                argListChanged(itemList)
+                            },
+                            argMemoChanged: { newMemo in
+                                itemList[index].memo = newMemo
+                                argListChanged(itemList)
+                            },
+                            argDeleted: {
+                                itemList.remove(at: index)
+                                argListChanged(itemList)
+                            },
+                            isLightMode: isLightMode
+                        )
+                    }
                     // - - - - - - - - - - - - - - - - - - -
 
                     Spacer()
@@ -38,3 +56,4 @@ struct ManagePage: View {
         }
     }
 }
+

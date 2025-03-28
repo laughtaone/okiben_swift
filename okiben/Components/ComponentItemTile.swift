@@ -2,13 +2,20 @@ import SwiftUI
 
 
 struct ComponentItemTile: View {
-    var title: String
+    // ================================================== 変数類 =================================================
+    var name: String
     var memo: String
-    var value: Bool
-    var onToggle: (Bool) -> Void
+    @Binding var value: Bool
+    var argIsOkibenChanged: (Bool) -> Void
+    var argNameChanged: (String) -> Void
+    var argMemoChanged: (String) -> Void
+    var argDeleted: () -> Void
     
     @State private var isDisplayDialog: DialogType? = nil
-    @State var inputNewItemName = ""
+    @State var inputNewName: String
+    @State var inputNewMemo: String
+    
+    var isLightMode: Bool
     
     enum DialogType: Identifiable {
         case main, edit, memo, delete
@@ -22,8 +29,34 @@ struct ComponentItemTile: View {
             }
         }
     }
+    
+    init(
+        name: String,
+        memo: String,
+        value: Binding<Bool>,
+        argIsOkibenChanged: @escaping (Bool) -> Void,
+        argNameChanged: @escaping (String) -> Void,
+        argMemoChanged: @escaping (String) -> Void,
+        argDeleted: @escaping () -> Void,
+        isLightMode: Bool
+    ) {
+        self.name = name
+        self.memo = memo
+        _value = value
+        self.argIsOkibenChanged = argIsOkibenChanged
+        self.argNameChanged = argNameChanged
+        self.argMemoChanged = argMemoChanged
+        self.argDeleted = argDeleted
+        self.isLightMode = isLightMode
+        
+        _inputNewName = State(initialValue: name)
+        _inputNewMemo = State(initialValue: memo)
+    }
+    // ==========================================================================================================
+    
+    
 
-    var argIsOnPressed: (Bool) -> Void
+    
 
 
     var body: some View {
@@ -32,43 +65,48 @@ struct ComponentItemTile: View {
                 // ================================================ ボタン本体 ================================================
                 Button(action: {
                     print("ボタンが押されたお")
-                    print("isDisplayDialogは、\(isDisplayDialog)")
                     isDisplayDialog = .main
-                    argIsOnPressed(true)
                 }) {
                     HStack {
                         VStack(alignment: .leading, spacing: 5) {
-                            Text(title)
+                            Text(name)
                                 .font(.system(size: 23, weight: .bold))
                                 .lineLimit(1)
                                 .truncationMode(.tail)
-                                .foregroundColor(.black)
+                                .foregroundColor((isLightMode) ? .black : .white)
                             
                             Text(memo)
                                 .font(.system(size: 13))
                                 .lineLimit(2)
                                 .multilineTextAlignment(.leading)
-                                .foregroundColor(.black)
+                                .foregroundColor((isLightMode) ? .black : .white)
                         }
                         Spacer()
-                        Toggle("", isOn: .constant(value))
+                        Toggle("", isOn: $value)
                             .labelsHidden()
                             .scaleEffect(1.3)
-                            .onChange(of: value) { newValue in
-                                onToggle(newValue)
+                            .onChange(of: value) {
+                                argIsOkibenChanged(value)
                             }
+                            .padding(.trailing, 5)
                     }
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 17)
                     .padding(.horizontal, 15)
-                    .background(Color.gray.opacity(0.1))
+                    .background(
+                        (isLightMode)
+                            ? Color(red: 244/255, green: 244/255, blue: 244/255)
+                            : Color(red: 68/255, green: 68/255, blue: 68/255)
+                    )
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                     )
+                    .frame(height: 60)
                 }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical)
                 // ==========================================================================================================
-                .frame(maxWidth: .infinity, minHeight: 95)
                 // ================================================ ダイアログ ================================================
                 .sheet(item: $isDisplayDialog) { dialogType in
                     switch dialogType {
@@ -83,33 +121,52 @@ struct ComponentItemTile: View {
                             content: {
                                 VStack(alignment: .leading) {
                                     // - - - - - - -　元の名前案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "元の名前", displayText: "サンプルタイトル")
+                                    ComponentTargetDisplayView(title: "元の名前", displayText: name)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
-                                    Spacer().frame(height: 40)
+                                    Spacer()
                                     
-                                    Text("↓ 変更後のアイテム名を入力")
+                                    // - - - -　アイテム名入力フィールド - - - -
+                                    Text("↓ 変更後の名前を入力")
                                         .font(.system(size: 14))
-                                    TextField("", text: $inputNewItemName)
+                                    TextEditor(text: $inputNewName)
                                         .font(.system(size: 16))
-                                        .padding()
+                                        .frame(height: 73)
+                                        .padding(.horizontal, 8)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                                         )
+                                    // - - - - - - - - - - - - - - - - - - -
 
-                                    Spacer().frame(height: 40)
+                                    Spacer()
                                     
+                                    // - - - - - - -　保存ボタン - - - - - - -
                                     ComponentCommonButton(
                                         buttonText: "保存",
-                                        onPressed: { print("保存ボタンが押されました") }
+                                        onPressed: (inputNewName != name)
+                                            ? {
+                                                print("保存ボタンが押されました")
+                                                argNameChanged(inputNewName)
+                                                isDisplayDialog = nil
+                                            }
+                                            : nil,
+                                        customButtonColor: (inputNewName != name)
+                                            ? (isLightMode)
+                                                ? Color(red: 85/255, green: 85/255, blue: 85/255)
+                                                : Color(red: 110/255, green: 110/255, blue: 110/255)
+                                            : (isLightMode)
+                                                ? Color(red: 235/255, green: 235/255, blue: 235/255)
+                                                : Color(red: 95/255, green: 95/255, blue: 95/255)
                                     )
                                     .padding(.horizontal)
                                     .frame(maxWidth: .infinity)
+                                    // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
                                 }
-                            }
+                            },
+                            isLightMode: isLightMode
                         )
                     // -------------------------------------------------------------------------------
                     // --------------------------------- メモダイアログ ---------------------------------
@@ -122,34 +179,51 @@ struct ComponentItemTile: View {
                             },
                             content: {
                                 VStack(alignment: .leading) {
-                                    // - - - - - - -　元の名前案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "元のメモ", displayText: "サンプルメモ")
+                                    // - - - - - - -　元のメモ案内 - - - - - -
+                                    ComponentTargetDisplayView(title: "元のメモ", displayText: memo)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
-                                    Spacer().frame(height: 40)
-                                    
+                                    Spacer()
+
+                                    // - - - - -　メモ入力フィールド - - - - -
                                     Text("↓ 変更後のメモを入力")
                                         .font(.system(size: 14))
-                                    TextField("", text: $inputNewItemName)
+                                    TextEditor(text: $inputNewMemo)
                                         .font(.system(size: 16))
-                                        .padding()
+                                        .frame(height: 100)
+                                        .padding(.horizontal, 8)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.gray.opacity(0.5), lineWidth: 1)
                                         )
+                                    // - - - - - - - - - - - - - - - - - - -
 
-                                    Spacer().frame(height: 40)
+                                    Spacer()
                                     
+                                    // - - - - - - -　保存ボタン - - - - - - -
                                     ComponentCommonButton(
                                         buttonText: "保存",
-                                        onPressed: { print("保存ボタンが押されました") }
+                                        onPressed: {
+                                            print("保存ボタンが押されました")
+                                            argMemoChanged(inputNewMemo)
+                                            isDisplayDialog = nil
+                                        },
+                                        customButtonColor: (inputNewMemo != memo)
+                                            ? (isLightMode)
+                                                ? Color(red: 85/255, green: 85/255, blue: 85/255)
+                                                : Color(red: 110/255, green: 110/255, blue: 110/255)
+                                            : (isLightMode)
+                                                ? Color(red: 235/255, green: 235/255, blue: 235/255)
+                                                : Color(red: 95/255, green: 95/255, blue: 95/255)
                                     )
                                     .padding(.horizontal)
                                     .frame(maxWidth: .infinity)
+                                    // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
                                 }
-                            }
+                            },
+                            isLightMode: isLightMode
                         )
                     // -------------------------------------------------------------------------------
                     // --------------------------------- 削除ダイアログ ---------------------------------
@@ -174,7 +248,7 @@ struct ComponentItemTile: View {
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     // - - - - - - -　削除対象案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "削除対象", displayText: "サンプルタイトル")
+                                    ComponentTargetDisplayView(title: "削除対象", displayText: name)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
@@ -182,7 +256,11 @@ struct ComponentItemTile: View {
                                     // - - - - - - 削除ボタン - - - - - - - -
                                     ComponentCommonButton(
                                         buttonText: "完全に削除",
-                                        onPressed: { print("ボタンが押されました") },
+                                        onPressed: {
+                                            print("ボタンが押されました")
+                                            argDeleted()
+                                            isDisplayDialog = nil
+                                        },
                                         customButtonColor: Color(red: 234/255, green: 89/255, blue: 110/255)
                                     )
                                     .padding(.horizontal)
@@ -191,7 +269,8 @@ struct ComponentItemTile: View {
                                     
                                     Spacer()
                                 }
-                            }
+                            },
+                            isLightMode: isLightMode
                         )
                     // -------------------------------------------------------------------------------
                     // --------------------------------- 操作ダイアログ ---------------------------------
@@ -205,7 +284,7 @@ struct ComponentItemTile: View {
                             content: {
                                 VStack {
                                     // - - - - - - -　操作対象案内 - - - - - - -
-                                    ComponentTargetDisplayView(title: "操作対象", displayText: "サンプルタイトル")
+                                    ComponentTargetDisplayView(title: "操作対象", displayText: name)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer().frame(height: 25)
@@ -219,7 +298,7 @@ struct ComponentItemTile: View {
                                                 isDisplayDialog = .edit
                                             },
                                             detailText: "アイテム名を編集",
-                                            centerText: "詳細情報"
+                                            centerText: name
                                         )
                                         ComponentOperationTileView(
                                             buttonText: "📋 メモ",
@@ -228,7 +307,7 @@ struct ComponentItemTile: View {
                                                 isDisplayDialog = .memo
                                             },
                                             detailText: "メモを編集",
-                                            centerText: "詳細情報"
+                                            centerText: memo
                                         )
                                     }
                                     // - - - - - - - - - - - - - - - - - - -
@@ -243,19 +322,20 @@ struct ComponentItemTile: View {
                                         HStack(alignment: .center, spacing: 7) {
                                             Image(systemName: "trash")
                                                 .font(.system(size: 15))
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.primary)
                                             Text("削除")
                                                 .font(.system(size: 13))
                                                 .lineLimit(1)
                                                 .truncationMode(.tail)
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.primary)
                                         }
                                     }
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
                                 }
-                            }
+                            },
+                            isLightMode: isLightMode
                         )
                     // -------------------------------------------------------------------------------
                     }

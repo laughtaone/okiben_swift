@@ -3,6 +3,7 @@ import SwiftUI
 struct ComponentCloseButton: View {
     var onPressed: () -> Void
     var customIconSize: CGFloat = 38  // アイコンサイズ (デフォルトは27)
+    var isLightMode: Bool
 
     @Environment(\.colorScheme) var colorScheme
 
@@ -12,10 +13,18 @@ struct ComponentCloseButton: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: customIconSize, height: customIconSize)
-                .foregroundColor(Color(red: 224/255, green: 224/255, blue: 224/255))
+                .foregroundColor(
+                    (isLightMode)
+                        ? Color(red: 224/255, green: 224/255, blue: 224/255)
+                        : Color(red: 100/255, green: 100/255, blue: 100/255)
+                )
                 .background(
                     Circle()
-                        .fill(Color(red: 21/255, green: 21/255, blue: 21/255))
+                        .fill(
+                            (isLightMode)
+                                ? Color(red: 21/255, green: 21/255, blue: 21/255)
+                                : Color(red: 240/255, green: 240/255, blue: 240/255)
+                        )
                 )
         }
             .buttonStyle(PlainButtonStyle())
@@ -23,9 +32,3 @@ struct ComponentCloseButton: View {
     }
 }
 
-struct ComponentCloseButton_Previews: PreviewProvider {
-    static var previews: some View {
-        ComponentCloseButton(onPressed: { print("Close button pressed") })
-            .previewLayout(.sizeThatFits)
-    }
-}

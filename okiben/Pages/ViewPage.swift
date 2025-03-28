@@ -2,16 +2,23 @@ import SwiftUI
 
 
 struct ViewPage: View {
+    // ================================================== 変数類 =================================================
+    @Binding var itemList: [ItemData]
+    var isLightMode: Bool
+    // ==========================================================================================================
+
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // --------------------- 冒頭説明フィールド ---------------------
             VStack(spacing: 5) {
                 HStack {
                     Image(systemName: "checkmark")
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .font(.system(size: 13))
                     
                     Text("持ち物がどこにあるか一目でわかります")
+                        .foregroundColor(.primary)
                         .font(.system(size: 15))
                         .padding(.leading, 0)
                     
@@ -20,10 +27,11 @@ struct ViewPage: View {
                 
                 HStack {
                     Image(systemName: "checkmark")
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .font(.system(size: 13))
                     
                     Text("スクロール可能です")
+                        .foregroundColor(.primary)
                         .font(.system(size: 15))
                         .padding(.leading, 0)
                     
@@ -32,25 +40,27 @@ struct ViewPage: View {
             }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 12)
-                .background(Color(hex: 0xf5f5f5))
+                .background((isLightMode) ? Color(hex: 0xf5f5f5) : Color(hex: 0x303030))
                 .cornerRadius(10)
                 .padding(.top, 8)
                 .padding(.bottom, 10)
             // -----------------------------------------------------------
             
             // ----------------------- 学校にあるもの ----------------------
-            ComponentViewTile(isInSchool: true, itemList: [["name": "Notebook", "isOkiben": true],
-                                                           ["name": "Pen", "isOkiben": true],
-                                                           ["name": "Bag", "isOkiben": true]])
+            ComponentViewTile(
+                isInSchool: true,
+                itemList: itemList
+            )
                 .padding(.bottom, 5)
             // -----------------------------------------------------------
             
             Spacer()
             
             // ------------------------ 家にあるもの -----------------------
-            ComponentViewTile(isInSchool: false, itemList: [["name": "Notebook", "isOkiben": false],
-                                                           ["name": "Pen", "isOkiben": false],
-                                                           ["name": "Bag", "isOkiben": false]])
+            ComponentViewTile(
+                isInSchool: false,
+                itemList: itemList
+            )
                 .padding(.top, 5)
             // -----------------------------------------------------------
         }

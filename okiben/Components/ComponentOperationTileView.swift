@@ -13,18 +13,18 @@ struct ComponentOperationTileView: View {
                 Text(buttonText)
                     .font(.system(size: 18, weight: .bold))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 // - - - - - - - - - - - - - - - - - - - -
                 
                 Spacer()
 
                 // - - - - - - - 真ん中のテキスト - - - - - -
                 Text(centerText)
-                    .font(.system(size: 12))
+                    .font(.system(size: 14))
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 // - - - - - - - - - - - - - - - - - - - -
                 
                 Spacer()
@@ -35,13 +35,13 @@ struct ComponentOperationTileView: View {
                         .font(.system(size: 13))
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     
                     Spacer()
                     
                     Image(systemName: "chevron.right")
                         .font(.system(size: 17))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                 }
                 // - - - - - - - - - - - - - - - - - - - -
             }
