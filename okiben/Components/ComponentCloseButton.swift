@@ -2,33 +2,37 @@ import SwiftUI
 
 struct ComponentCloseButton: View {
     var onPressed: () -> Void
-    var customIconSize: CGFloat = 38  // アイコンサイズ (デフォルトは27)
+    var customIconSize: CGFloat = 39  // アイコンサイズ
     var isLightMode: Bool
 
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         Button(action: onPressed) {
-            Image(systemName: "xmark.circle.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: customIconSize, height: customIconSize)
-                .foregroundColor(
-                    (isLightMode)
-                        ? Color(red: 224/255, green: 224/255, blue: 224/255)
-                        : Color(red: 100/255, green: 100/255, blue: 100/255)
-                )
-                .background(
-                    Circle()
-                        .fill(
-                            (isLightMode)
-                                ? Color(red: 21/255, green: 21/255, blue: 21/255)
-                                : Color(red: 240/255, green: 240/255, blue: 240/255)
-                        )
-                )
+            ZStack {
+                // 背景の円
+                Circle()
+                    .fill(
+                        (isLightMode)
+                            ? Color(red: 240/255, green: 240/255, blue: 240/255)
+                            : Color(red: 140/255, green: 140/255, blue: 140/255)
+                    )
+                    .frame(width: customIconSize, height: customIconSize)
+                
+                // バツマーク
+                Image(systemName: "xmark")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .font(.system(size: customIconSize * 0.38, weight: .bold))
+                    .frame(width: customIconSize * 0.38, height: customIconSize * 0.38)
+                    .foregroundColor(
+                        (isLightMode)
+                            ? Color(red: 100/255, green: 100/255, blue: 100/255)
+                            : Color(red: 20/255, green: 20/255, blue: 20/255)
+                    )
+            }
         }
-            .buttonStyle(PlainButtonStyle())
-            .padding(.top, 15)
+        .buttonStyle(PlainButtonStyle())
+        .padding(.top, 15)
     }
 }
-

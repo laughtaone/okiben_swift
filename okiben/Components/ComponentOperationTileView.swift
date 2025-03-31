@@ -5,6 +5,7 @@ struct ComponentOperationTileView: View {
     let onPressed: () -> Void
     let detailText: String
     let centerText: String
+    let isLightMode: Bool
 
     var body: some View {
         Button(action: onPressed) {
@@ -48,7 +49,9 @@ struct ComponentOperationTileView: View {
             .padding(12)
             .frame(maxWidth: .infinity, maxHeight: 150)
             .background(
-                Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor.darkGray : UIColor.systemGray6 })
+                (isLightMode)
+                    ? Color(red: 236/255, green: 235/255, blue: 241/255)
+                    : Color(red: 70/255, green: 68/255, blue: 65/255)
             )
             .cornerRadius(8)
         }

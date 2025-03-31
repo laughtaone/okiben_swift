@@ -108,7 +108,13 @@ struct ComponentItemTile: View {
                 .padding(.vertical)
                 // ==========================================================================================================
                 // ================================================ ダイアログ ================================================
-                .sheet(item: $isDisplayDialog) { dialogType in
+                .sheet(
+                    item: $isDisplayDialog,
+                    onDismiss: {
+                        inputNewName = name
+                        inputNewMemo = memo
+                    }
+                ) { dialogType in
                     switch dialogType {
                     // --------------------------------- 編集ダイアログ ---------------------------------
                     case .edit:
@@ -121,7 +127,7 @@ struct ComponentItemTile: View {
                             content: {
                                 VStack(alignment: .leading) {
                                     // - - - - - - -　元の名前案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "元の名前", displayText: name)
+                                    ComponentTargetDisplayView(title: "元の名前", displayText: name, isLightMode: isLightMode)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
@@ -129,10 +135,9 @@ struct ComponentItemTile: View {
                                     // - - - -　アイテム名入力フィールド - - - -
                                     Text("↓ 変更後の名前を入力")
                                         .font(.system(size: 14))
-                                    TextEditor(text: $inputNewName)
+                                    TextField("", text: $inputNewName)
                                         .font(.system(size: 16))
-                                        .frame(height: 73)
-                                        .padding(.horizontal, 8)
+                                        .padding()
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
                                                 .stroke(Color.gray.opacity(0.5), lineWidth: 1)
@@ -144,7 +149,7 @@ struct ComponentItemTile: View {
                                     // - - - - - - -　保存ボタン - - - - - - -
                                     ComponentCommonButton(
                                         buttonText: "保存",
-                                        onPressed: (inputNewName != name)
+                                        onPressed: (inputNewName != name && inputNewName != "")
                                             ? {
                                                 print("保存ボタンが押されました")
                                                 argNameChanged(inputNewName)
@@ -180,7 +185,7 @@ struct ComponentItemTile: View {
                             content: {
                                 VStack(alignment: .leading) {
                                     // - - - - - - -　元のメモ案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "元のメモ", displayText: memo)
+                                    ComponentTargetDisplayView(title: "元のメモ", displayText: memo, isLightMode: isLightMode)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
@@ -203,12 +208,14 @@ struct ComponentItemTile: View {
                                     // - - - - - - -　保存ボタン - - - - - - -
                                     ComponentCommonButton(
                                         buttonText: "保存",
-                                        onPressed: {
-                                            print("保存ボタンが押されました")
-                                            argMemoChanged(inputNewMemo)
-                                            isDisplayDialog = nil
-                                        },
-                                        customButtonColor: (inputNewMemo != memo)
+                                        onPressed: (inputNewMemo != memo && inputNewMemo != "")
+                                            ? {
+                                                print("保存ボタンが押されました")
+                                                argNameChanged(inputNewMemo)
+                                                isDisplayDialog = nil
+                                            }
+                                            : nil,
+                                        customButtonColor: (inputNewMemo != memo && inputNewMemo != "")
                                             ? (isLightMode)
                                                 ? Color(red: 85/255, green: 85/255, blue: 85/255)
                                                 : Color(red: 110/255, green: 110/255, blue: 110/255)
@@ -248,7 +255,7 @@ struct ComponentItemTile: View {
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     // - - - - - - -　削除対象案内 - - - - - -
-                                    ComponentTargetDisplayView(title: "削除対象", displayText: name)
+                                    ComponentTargetDisplayView(title: "削除対象", displayText: name, isLightMode: isLightMode)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer()
@@ -284,7 +291,7 @@ struct ComponentItemTile: View {
                             content: {
                                 VStack {
                                     // - - - - - - -　操作対象案内 - - - - - - -
-                                    ComponentTargetDisplayView(title: "操作対象", displayText: name)
+                                    ComponentTargetDisplayView(title: "操作対象", displayText: name, isLightMode: isLightMode)
                                     // - - - - - - - - - - - - - - - - - - -
                                     
                                     Spacer().frame(height: 25)
@@ -298,7 +305,8 @@ struct ComponentItemTile: View {
                                                 isDisplayDialog = .edit
                                             },
                                             detailText: "アイテム名を編集",
-                                            centerText: name
+                                            centerText: name,
+                                            isLightMode: isLightMode
                                         )
                                         ComponentOperationTileView(
                                             buttonText: "📋 メモ",
@@ -307,7 +315,8 @@ struct ComponentItemTile: View {
                                                 isDisplayDialog = .memo
                                             },
                                             detailText: "メモを編集",
-                                            centerText: memo
+                                            centerText: memo,
+                                            isLightMode: isLightMode
                                         )
                                     }
                                     // - - - - - - - - - - - - - - - - - - -

@@ -60,6 +60,7 @@ struct Main: View {
                                     isDisplaySettingPage.toggle()
                                 }) {
                                     Image(systemName: "gearshape")
+                                        .foregroundColor(.primary)
                                 }
                             }
                             // - - - - - - - - - - - - - - - - - - -
@@ -97,7 +98,9 @@ struct Main: View {
                         )
                             .tabItem {
                                 Image(systemName: "map")
+                                    .foregroundColor(.primary)
                                 Text("ビュー")
+                                    .foregroundColor(.primary)
                             }
                             .tag(1)
                     }
@@ -140,7 +143,12 @@ struct Main: View {
                             }
                             .padding(.trailing, 20)
                             .padding(.bottom, 80)
-                            .sheet(isPresented: $isDisplayAddPage) {
+                            .sheet(
+                                isPresented: $isDisplayAddPage,
+                                onDismiss: {
+                                    inputNewItemName = ""
+                                }
+                            ) {
                                 ComponentUpDialog(
                                     showModal: .constant(true),
                                     title: "📚 アイテム追加",
@@ -190,7 +198,8 @@ struct Main: View {
                                             
                                             Spacer()
                                         }
-                                    }
+                                    },
+                                    isLightMode: isLightMode
                                 )
                             }
                         }

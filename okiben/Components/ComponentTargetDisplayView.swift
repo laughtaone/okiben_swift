@@ -3,6 +3,7 @@ import SwiftUI
 struct ComponentTargetDisplayView: View {
     let title: String
     let displayText: String
+    let isLightMode: Bool
 
     var body: some View {
         HStack {
@@ -23,7 +24,9 @@ struct ComponentTargetDisplayView: View {
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity)
         .background(
-            Color(UIColor { $0.userInterfaceStyle == .dark ? UIColor.darkGray : UIColor.systemGray6 })
+            (isLightMode)
+                ? Color(red: 246/255, green: 245/255, blue: 251/255)
+                : Color(red: 48/255, green: 46/255, blue: 53/255)
         )
         .cornerRadius(12)
     }

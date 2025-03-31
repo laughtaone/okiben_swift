@@ -15,6 +15,8 @@ struct SettingsPage: View {
     @State private var showGitHub = false
     @State private var showX = false
     @State private var showAppStore = false
+    @State private var showBugReportForm = false
+    @State private var showOtherReportForm = false
     @State private var showTermsOfService = false
     @State private var showPrivacyPolicy = false
     @State private var showUsePackages = false
@@ -28,6 +30,7 @@ struct SettingsPage: View {
     var argListClear: () -> Void
     
     var isLightMode: Bool
+    let betweenIconTextSpacing: CGFloat = 12
     // ==========================================================================================================
     
     
@@ -46,7 +49,7 @@ struct SettingsPage: View {
                         header: Text("外観モード"),
                         footer: Text("画面全体の配色をカスタマイズできます。")
                     ) {
-                        HStack {
+                        HStack(spacing: betweenIconTextSpacing) {
                             Image(systemName: "sun.max")
                             Picker("外観モード", selection: $nowDisplayMode) {
                                 ForEach(displayModeList, id: \.self) { displayMode in
@@ -68,12 +71,12 @@ struct SettingsPage: View {
                     
                     // ---------------------------------- アプリ使い方 ---------------------------------
                     Section(header: Text("このアプリの使い方")) {
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: betweenIconTextSpacing) {
                             Image(systemName: "1.square")
                                 .padding(.top, 2)
                             Text("アイテムを「置き勉管理」タブの右下の+ボタンから追加します")
                         }
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: betweenIconTextSpacing) {
                             Image(systemName: "2.square")
                                 .padding(.top, 2)
                                 .foregroundColor(.primary)
@@ -84,13 +87,13 @@ struct SettingsPage: View {
                                 Text("にします")
                             }
                         }
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: betweenIconTextSpacing) {
                             Image(systemName: "3.square")
                                 .padding(.top, 2)
                                 .foregroundColor(.primary)
                             Text("各アイテムをタップすると「編集」「メモ」「削除」の操作ができます")
                         }
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: betweenIconTextSpacing) {
                             Image(systemName: "4.square")
                                 .padding(.top, 2)
                                 .foregroundColor(.primary)
@@ -109,7 +112,7 @@ struct SettingsPage: View {
                             isDisplayAllDeleteDialog = true
                             isUnlockedAllDelete = false
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Image(systemName: "flame").foregroundColor(.red)
                                 Text("登録中のアイテムを一括削除").foregroundColor(.red)
                                 Spacer()
@@ -212,7 +215,7 @@ struct SettingsPage: View {
                             print("GitHubボタンが押されたお")
                             showGitHub.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Text(String.FontAwesome(unicode: "f09b"))
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
@@ -232,7 +235,7 @@ struct SettingsPage: View {
                             print("Xボタンが押されたお")
                             showX.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Text(String.FontAwesome(unicode: "e61b"))
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
@@ -252,7 +255,7 @@ struct SettingsPage: View {
                             print("AppStoreボタンが押されたお")
                             showAppStore.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Text(String.FontAwesome(unicode: "f370"))
                                     .font(.custom(CustomFonts.FABrandsRegular, size: 22))
                                     .foregroundColor(.gray)
@@ -269,6 +272,41 @@ struct SettingsPage: View {
                     }
                     // -------------------------------------------------------------------------------
                     
+                    // ----------------------------------- 報告フォーム ---------------------------------
+                    Section(header: Text("報告フォーム")) {
+                        // - - - - - - - - バグ報告 - - - - - - - -
+                        Button {
+                            showBugReportForm.toggle()
+                        } label: {
+                            HStack(spacing: betweenIconTextSpacing) {
+                                Image(systemName: "ladybug").foregroundColor(.gray)
+                                Text("バグ報告フォーム").foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.forward").foregroundColor(.gray)
+                            }
+                        }
+                        .sheet(isPresented: $showBugReportForm) {
+                            SafariView(url: URL(string: "https://forms.gle/EmXnYPVgnmDq5nwe8")!)
+                        }
+                        // - - - - - - - - - - - - - - - - - - - -
+                        // - - - - - - - - その他報告 - - - - - - - -
+                        Button {
+                            showOtherReportForm.toggle()
+                        } label: {
+                            HStack(spacing: betweenIconTextSpacing) {
+                                Image(systemName: "paperplane").foregroundColor(.gray)
+                                Text("その他報告・お問い合わせ").foregroundColor(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.forward").foregroundColor(.gray)
+                            }
+                        }
+                        .sheet(isPresented: $showOtherReportForm) {
+                            SafariView(url: URL(string: "https://forms.gle/FSJocHE4cvE3LPkF8")!)
+                        }
+                        // - - - - - - - - - - - - - - - - - - -
+                    }
+                    // -------------------------------------------------------------------------------
+                    
                     // ---------------------------------- アプリについて --------------------------------
                     Section(header: Text("アプリについて")) {
                         // - - - - - - - - 利用規約 - - - - - - - -
@@ -276,7 +314,7 @@ struct SettingsPage: View {
                             print("利用規約ボタンが押されたお")
                             showTermsOfService.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Image(systemName: "text.document").foregroundColor(.gray)
                                 Text("利用規約").foregroundColor(.primary)
                                 Spacer()
@@ -292,7 +330,7 @@ struct SettingsPage: View {
                             print("プライバシーポリシーボタンが押されたお")
                             showPrivacyPolicy.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Image(systemName: "text.document").foregroundColor(.gray)
                                 Text("プライバシーポリシー").foregroundColor(.primary)
                                 Spacer()
@@ -308,7 +346,7 @@ struct SettingsPage: View {
                             print("使用パッケージボタンが押されたお")
                             showUsePackages.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Image(systemName: "book.closed").foregroundColor(.gray)
                                 Text("使用パッケージ").foregroundColor(.primary)
                                 Spacer()
@@ -329,10 +367,11 @@ struct SettingsPage: View {
                             print("アプリバージョンボタンが押されたお")
                             showAppVersion.toggle()
                         } label: {
-                            HStack {
+                            HStack(spacing: betweenIconTextSpacing) {
                                 Image(systemName: "number").foregroundColor(.gray)
                                 Text("アプリバージョン").foregroundColor(.primary)
                                 Spacer()
+                                Text("1.0.0").foregroundColor(.primary)
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
                         }
