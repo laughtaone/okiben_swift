@@ -7,10 +7,11 @@ struct Main: View {
     @State private var isDisplayAddPage = false
     @State var inputNewItemName = ""
 
-    @State private var itemList: [ItemData] = [
-        ItemData(name: "数学の教科書", memo: "Aくんに貸した", isOkiben: true),
-        ItemData(name: "英語の教科書", memo: "来週の授業で必要！", isOkiben: false)
-    ]
+//    @State private var itemList: [ItemData] = [
+//        ItemData(name: "数学の教科書", memo: "Aくんに貸した", isOkiben: true),
+//        ItemData(name: "英語の教科書", memo: "来週の授業で必要！", isOkiben: false)
+//    ]
+    @State private var itemList: [ItemData] = loadItemList()
     
     // ライトモードかどうかの真偽値
     @Environment(\.colorScheme) var colorScheme
@@ -18,7 +19,11 @@ struct Main: View {
         colorScheme == .light
     }
     
-    init(){
+    @AppStorage("appearanceMode") private var appearanceMode: String = "system"
+    
+    init() {
+        applyAppearanceMode(appearanceMode)
+        
         // TabViewの背景色の設定
         UITabBar.appearance().backgroundColor = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1)
         
@@ -82,6 +87,7 @@ struct Main: View {
                             itemList: $itemList,
                             argListChanged: { newList in
                                 itemList = newList
+                                saveItemList()
                             },
                             isLightMode: isLightMode
                         )
@@ -114,6 +120,7 @@ struct Main: View {
                         },
                         argListClear: {
                             itemList.removeAll()
+                            saveItemList()
                         },
                         isLightMode: isLightMode
                     )
@@ -182,6 +189,7 @@ struct Main: View {
                                                         itemList.append(ItemData(name: inputNewItemName, memo: "", isOkiben: false))
                                                         inputNewItemName = ""
                                                         isDisplayAddPage = false
+                                                        saveItemList()
                                                     }
                                                     : nil,
                                                 customButtonColor: (inputNewItemName != "")
@@ -210,6 +218,48 @@ struct Main: View {
             }
         }
     }
+    
+    
+    // ============================================== 外観モード管理 ==============================================
+    // 外観モードを適用
+    private func applyAppearanceMode(_ mode: String) {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else { return }
+
+        switch mode {
+        case "light":
+            window.overrideUserInterfaceStyle = .light
+        case "dark":
+            window.overrideUserInterfaceStyle = .dark
+        default:
+            window.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
+    // 外観モードを変更する関数
+    func changeAppearanceMode(to mode: String) {
+        appearanceMode = mode
+        applyAppearanceMode(mode)
+    }
+    // ==========================================================================================================
+    // ============================================= アイテムデータ管理 ============================================
+    // ------------------------------ アイテムリスト 書き込み ----------------------------
+    func saveItemList() {
+        if let encoded = try? JSONEncoder().encode(itemList) {
+            UserDefaults.standard.set(encoded, forKey: "itemList")
+        }
+    }
+    // ------------------------------------------------------------------------------
+    // ------------------------------ アイテムリスト 読み込み ----------------------------
+    static func loadItemList() -> [ItemData] {
+        if let data = UserDefaults.standard.data(forKey: "itemList"),
+           let decoded = try? JSONDecoder().decode([ItemData].self, from: data) {
+            return decoded
+        }
+        return [] // 初期値として空のリストを返す
+    }
+    // -------------------------------------------------------------------------------
+    // ==========================================================================================================
 }
 
 
@@ -221,9 +271,10 @@ struct Main: View {
 
 
 
-struct ItemData: Identifiable {
+struct ItemData: Identifiable, Codable {
     var id = UUID()
     var name: String
     var memo: String
     var isOkiben: Bool
 }
+

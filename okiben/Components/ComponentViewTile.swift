@@ -5,6 +5,7 @@ struct ComponentViewTile: View {
     // ================================================== 変数類 =================================================
     let isInSchool: Bool
     let itemList: [ItemData]
+    let isLightMode: Bool
     // ==========================================================================================================
     
     var filteredItems: [ItemData] {
@@ -31,9 +32,10 @@ struct ComponentViewTile: View {
             Spacer()
             
             if filteredItems.isEmpty {
-                Text("該当する持ち物はありません")
+                Text("該当するアイテムはありません")
+                Spacer()
             } else {
-                FilteredItemListView(filteredItems: filteredItems)
+                FilteredItemListView(filteredItems: filteredItems, isLightMode: isLightMode)
                     .padding(.top, 0)
             }
         }
@@ -41,9 +43,10 @@ struct ComponentViewTile: View {
 }
 
 
-// 枠線と中身部分
+// -------------------------------- 枠線と中身部分 ----------------------------------
 struct FilteredItemListView: View {
     let filteredItems: [ItemData]
+    let isLightMode: Bool
     
     var body: some View {
         ScrollView {
@@ -57,14 +60,18 @@ struct FilteredItemListView: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.black.opacity(0.38), lineWidth: 1)    // 枠線
+                .stroke(
+                    (isLightMode)
+                        ? Color(red: 200/255, green: 200/255, blue: 200/255)
+                        : Color(red: 110/255, green: 110/255, blue: 110/255),
+                    lineWidth: 1
+                )
                 .background((Color(UIColor.systemBackground)).cornerRadius(10))
         )
     }
 }
-
-
-// 個々のアイテム名
+// -------------------------------------------------------------------------------
+// -------------------------------- 個々のアイテム名 ---------------------------------
 struct FilteredItemRow: View {
     let item: ItemData
     
@@ -76,3 +83,4 @@ struct FilteredItemRow: View {
             .padding(.horizontal, 5)
     }
 }
+// -------------------------------------------------------------------------------

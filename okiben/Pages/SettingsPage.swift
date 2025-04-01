@@ -8,7 +8,9 @@ struct SettingsPage: View {
     @State private var selectedLanguage = "日本語"
     let languages = ["日本語", "English", "Español"]
     
-    @State private var nowDisplayMode = "system"
+//    @State private var nowDisplayMode = "system"
+//    let displayModeList = ["system", "light", "dark"]
+    @AppStorage("appearanceMode") private var nowDisplayMode = "system"
     let displayModeList = ["system", "light", "dark"]
     
     
@@ -33,8 +35,6 @@ struct SettingsPage: View {
     let betweenIconTextSpacing: CGFloat = 12
     // ==========================================================================================================
     
-    
-    
 
     var body: some View {
         ComponentUpDialog(
@@ -49,24 +49,22 @@ struct SettingsPage: View {
                         header: Text("外観モード"),
                         footer: Text("画面全体の配色をカスタマイズできます。")
                     ) {
-                        HStack(spacing: betweenIconTextSpacing) {
+                        HStack(spacing: 10) {
                             Image(systemName: "sun.max")
                             Picker("外観モード", selection: $nowDisplayMode) {
                                 ForEach(displayModeList, id: \.self) { displayMode in
-                                    Text((displayMode == "system")
-                                        ? "端末に合わせる"
-                                        : (displayMode == "light")
-                                            ? "ライトモード"
-                                            : (displayMode == "dark")
-                                                ? "ダークモード"
-                                                : "不明"
-                                    )
+                                    Text(displayModeText(displayMode)).tag(displayMode)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
+                            .onChange(of: nowDisplayMode) {
+                                applyAppearanceMode(nowDisplayMode)
+                            }
                         }
                     }
-                    
+                    .onAppear {
+                        applyAppearanceMode(nowDisplayMode)
+                    }
                     // -------------------------------------------------------------------------------
                     
                     // ---------------------------------- アプリ使い方 ---------------------------------
@@ -183,7 +181,7 @@ struct SettingsPage: View {
                                             .background((isUnlockedAllDelete)
                                                 ? (isLightMode)
                                                     ? Color(red: 251/255, green: 251/255, blue: 251/255)
-                                                    : Color(red: 65/255, green: 65/255, blue: 65/255)
+                                                    : Color(red: 50/255, green: 50/255, blue: 50/255)
                                                 : (isLightMode)
                                                     ? Color(red: 224/255, green: 224/255, blue: 224/255)
                                                     : Color(red: 115/255, green: 115/255, blue: 115/255)
@@ -322,7 +320,7 @@ struct SettingsPage: View {
                             }
                         }
                         .sheet(isPresented: $showTermsOfService) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818105bedff6564a185f55?pvs=4")!)
+                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818110835ee622725f21e0?pvs=4")!)
                         }
                         // - - - - - - - - - - - - - - - - - - -
                         // - - - - - プライバシーポリシー - - - - -
@@ -338,23 +336,7 @@ struct SettingsPage: View {
                             }
                         }
                         .sheet(isPresented: $showPrivacyPolicy) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818105bedff6564a185f55?pvs=4")!)
-                        }
-                        // - - - - - - - - - - - - - - - - - - -
-                        // - - - - - - 使用パッケージ - - - - - - -
-                        Button {
-                            print("使用パッケージボタンが押されたお")
-                            showUsePackages.toggle()
-                        } label: {
-                            HStack(spacing: betweenIconTextSpacing) {
-                                Image(systemName: "book.closed").foregroundColor(.gray)
-                                Text("使用パッケージ").foregroundColor(.primary)
-                                Spacer()
-                                Image(systemName: "chevron.forward").foregroundColor(.gray)
-                            }
-                        }
-                        .sheet(isPresented: $showUsePackages) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818105bedff6564a185f55?pvs=4")!)
+                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818159b345df3c4416aa09?pvs=4")!)
                         }
                         // - - - - - - - - - - - - - - - - - - -
                     }
@@ -385,6 +367,38 @@ struct SettingsPage: View {
             isLightMode: isLightMode
         )
     }
+    
+    
+    // ============================================= 外観モードの変更 =============================================
+    // 表示するテキストを返す
+    private func displayModeText(_ mode: String) -> String {
+        switch mode {
+        case "system": return "端末に合わせる"
+        case "light": return "ライトモード"
+        case "dark": return "ダークモード"
+        default: return "不明"
+        }
+    }
+
+    // 外観モードを適用
+    private func applyAppearanceMode(_ mode: String) {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first else { return }
+
+        // 外観モードを保存
+        UserDefaults.standard.set(mode, forKey: "appearanceMode")
+
+        switch mode {
+        case "light":
+            window.overrideUserInterfaceStyle = .light
+        case "dark":
+            window.overrideUserInterfaceStyle = .dark
+        default:
+            window.overrideUserInterfaceStyle = .unspecified
+        }
+    }
+
+    // ==========================================================================================================
 }
 
 
@@ -433,3 +447,4 @@ struct SafariViewControllerWrapper: UIViewControllerRepresentable {
     }
 }
 // ==========================================================================================================
+

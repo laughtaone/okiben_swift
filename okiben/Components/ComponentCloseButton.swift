@@ -10,7 +10,7 @@ struct ComponentCloseButton: View {
     var body: some View {
         Button(action: onPressed) {
             ZStack {
-                // 背景の円
+                // ------------------------------------ 背景の円 -----------------------------------
                 Circle()
                     .fill(
                         (isLightMode)
@@ -18,8 +18,9 @@ struct ComponentCloseButton: View {
                             : Color(red: 140/255, green: 140/255, blue: 140/255)
                     )
                     .frame(width: customIconSize, height: customIconSize)
+                // -------------------------------------------------------------------------------
                 
-                // バツマーク
+                // ------------------------------------ バツマーク ---------------------------------
                 Image(systemName: "xmark")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -30,6 +31,7 @@ struct ComponentCloseButton: View {
                             ? Color(red: 100/255, green: 100/255, blue: 100/255)
                             : Color(red: 20/255, green: 20/255, blue: 20/255)
                     )
+                // -------------------------------------------------------------------------------
             }
         }
         .buttonStyle(PlainButtonStyle())

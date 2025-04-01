@@ -211,7 +211,7 @@ struct ComponentItemTile: View {
                                         onPressed: (inputNewMemo != memo && inputNewMemo != "")
                                             ? {
                                                 print("保存ボタンが押されました")
-                                                argNameChanged(inputNewMemo)
+                                                argMemoChanged(inputNewMemo)
                                                 isDisplayDialog = nil
                                             }
                                             : nil,

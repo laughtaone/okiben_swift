@@ -11,7 +11,9 @@ struct ManagePage: View {
 
 
     var body: some View {
-        ZStack {
+        if (itemList.count == 0) {
+            ComponentNoItemDisplay(type: 1)
+        } else {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     // - - - - - - - アイテム数表示 - - - - - -
@@ -19,7 +21,7 @@ struct ManagePage: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.bottom, 10)
                     // - - - - - - - - - - - - - - - - - - -
-
+                    
                     // - - - - - - - アイテムタイル - - - - - -
                     ForEach(itemList.indices, id: \.self) { index in
                         ComponentItemTile(
@@ -46,13 +48,12 @@ struct ManagePage: View {
                         )
                     }
                     // - - - - - - - - - - - - - - - - - - -
-
+                    
                     Spacer()
                 }
-                .padding([.leading, .trailing], 15)
-                .padding(.bottom, 65)
             }
-            .padding(.trailing, 0)
+            .padding([.leading, .trailing], 15)
+            .padding(.bottom, (itemList.count == 0) ? 0 : 65)
         }
     }
 }
