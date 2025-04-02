@@ -320,7 +320,7 @@ struct SettingsPage: View {
                             }
                         }
                         .sheet(isPresented: $showTermsOfService) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818110835ee622725f21e0?pvs=4")!)
+                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-1b0b5b93908181ff9708cf490a5226ed?pvs=4")!)
                         }
                         // - - - - - - - - - - - - - - - - - - -
                         // - - - - - プライバシーポリシー - - - - -
@@ -336,7 +336,7 @@ struct SettingsPage: View {
                             }
                         }
                         .sheet(isPresented: $showPrivacyPolicy) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818159b345df3c4416aa09?pvs=4")!)
+                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-1b0b5b93908181f983eaff351ba2d06b?pvs=4")!)
                         }
                         // - - - - - - - - - - - - - - - - - - -
                     }
@@ -353,12 +353,12 @@ struct SettingsPage: View {
                                 Image(systemName: "number").foregroundColor(.gray)
                                 Text("アプリバージョン").foregroundColor(.primary)
                                 Spacer()
-                                Text("1.0.0").foregroundColor(.primary)
+                                Text("1.1").foregroundColor(.gray)
                                 Image(systemName: "chevron.forward").foregroundColor(.gray)
                             }
                         }
                         .sheet(isPresented: $showAppVersion) {
-                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-Swift-1c2b5b9390818105bedff6564a185f55?pvs=4")!)
+                            SafariView(url: URL(string: "https://laughtaone.notion.site/okiben-1b0b5b93908181d0b8e7e7d71066e384?pvs=4")!)
                         }
                     }
                     // -------------------------------------------------------------------------------

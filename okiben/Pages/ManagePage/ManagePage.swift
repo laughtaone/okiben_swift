@@ -51,9 +51,9 @@ struct ManagePage: View {
                     
                     Spacer()
                 }
+                .padding(.horizontal, 15)
+                .padding(.bottom, 55)
             }
-            .padding([.leading, .trailing], 15)
-            .padding(.bottom, (itemList.count == 0) ? 0 : 65)
         }
     }
 }
